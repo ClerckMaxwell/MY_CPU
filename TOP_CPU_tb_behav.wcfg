@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="TOP_CPU_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="TOP_CPU_tb" />
+            <top_module name="cpu_defs" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="1000000001fs"></ZoomEndTime>
+      <Cursor1Time time="102030000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="208"></NameColumnWidth>
+      <ValueColumnWidth column_width="116"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="29" />
+   <wvobject fp_name="/TOP_CPU_tb/clock_tb" type="logic">
+      <obj_property name="ElementShortName">clock_tb</obj_property>
+      <obj_property name="ObjectShortName">clock_tb</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/reset_tb" type="logic">
+      <obj_property name="ElementShortName">reset_tb</obj_property>
+      <obj_property name="ObjectShortName">reset_tb</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/ADDRESS" type="array">
+      <obj_property name="ElementShortName">ADDRESS[15:0]</obj_property>
+      <obj_property name="ObjectShortName">ADDRESS[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/DATA_IN" type="array">
+      <obj_property name="ElementShortName">DATA_IN[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_IN[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/PC" type="array">
+      <obj_property name="ElementShortName">PC[15:0]</obj_property>
+      <obj_property name="ObjectShortName">PC[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/MEMORY_PORT/inst/\native_mem_module.blk_mem_gen_v8_4_2_inst /DOUTA" type="array">
+      <obj_property name="ElementShortName">DOUTA[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DOUTA[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/MEMORY_PORT/dina" type="array">
+      <obj_property name="ElementShortName">dina[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dina[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/MEMORY_PORT/inst/\native_mem_module.blk_mem_gen_v8_4_2_inst /WEA" type="array">
+      <obj_property name="ElementShortName">WEA[0:0]</obj_property>
+      <obj_property name="ObjectShortName">WEA[0:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/MEMORY_PORT/ena" type="logic">
+      <obj_property name="ElementShortName">ena</obj_property>
+      <obj_property name="ObjectShortName">ena</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/DATA_RX" type="array">
+      <obj_property name="ElementShortName">DATA_RX[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_RX[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/DATA_RY" type="array">
+      <obj_property name="ElementShortName">DATA_RY[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_RY[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/DATA_RZ" type="array">
+      <obj_property name="ElementShortName">DATA_RZ[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_RZ[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/DATA_RA" type="array">
+      <obj_property name="ElementShortName">DATA_RA[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_RA[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/DATA_RB" type="array">
+      <obj_property name="ElementShortName">DATA_RB[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_RB[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/DATA_RC" type="array">
+      <obj_property name="ElementShortName">DATA_RC[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DATA_RC[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/FLAGZ" type="logic">
+      <obj_property name="ElementShortName">FLAGZ</obj_property>
+      <obj_property name="ObjectShortName">FLAGZ</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/FLAGNZ" type="logic">
+      <obj_property name="ElementShortName">FLAGNZ</obj_property>
+      <obj_property name="ObjectShortName">FLAGNZ</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/FLAGN" type="logic">
+      <obj_property name="ElementShortName">FLAGN</obj_property>
+      <obj_property name="ObjectShortName">FLAGN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/FLAGP" type="logic">
+      <obj_property name="ElementShortName">FLAGP</obj_property>
+      <obj_property name="ObjectShortName">FLAGP</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/ALU_PORT/FAST_CMP_C" type="array">
+      <obj_property name="ElementShortName">FAST_CMP_C[15:0]</obj_property>
+      <obj_property name="ObjectShortName">FAST_CMP_C[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/ALU_PORT/FAST_CMP_D" type="array">
+      <obj_property name="ElementShortName">FAST_CMP_D[15:0]</obj_property>
+      <obj_property name="ObjectShortName">FAST_CMP_D[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/ALU_PORT/FAST_RES" type="array">
+      <obj_property name="ElementShortName">FAST_RES[15:0]</obj_property>
+      <obj_property name="ObjectShortName">FAST_RES[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/ALU_PORT/NEG_D" type="array">
+      <obj_property name="ElementShortName">NEG_D[15:0]</obj_property>
+      <obj_property name="ObjectShortName">NEG_D[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/cin" type="logic">
+      <obj_property name="ElementShortName">cin</obj_property>
+      <obj_property name="ObjectShortName">cin</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/ALU_REG" type="array">
+      <obj_property name="ElementShortName">ALU_REG[15:0]</obj_property>
+      <obj_property name="ObjectShortName">ALU_REG[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/ALU_REG2" type="array">
+      <obj_property name="ElementShortName">ALU_REG2[15:0]</obj_property>
+      <obj_property name="ObjectShortName">ALU_REG2[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/FSM_port/flag_alu" type="logic">
+      <obj_property name="ElementShortName">flag_alu</obj_property>
+      <obj_property name="ObjectShortName">flag_alu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP_CPU_tb/DUT/ALU_PORT/compare" type="logic">
+      <obj_property name="ElementShortName">compare</obj_property>
+      <obj_property name="ObjectShortName">compare</obj_property>
+   </wvobject>
+</wave_config>
