@@ -1,0 +1,25 @@
+# Vivado generated files
+*.jou
+*.log
+*.wdb
+*.str
+*.pb
+*.os
+*.jou
+*.zip
+.Xil/
+hd_visual/
+xsim.dir/
+
+# Synthesis and implementation results (optional: remove if you want to keep bitstream)
+*.bit
+*.bin
+*.dcp
+
+# Project specific
+*.ip_user_files/
+*.hw/
+*.sim/
+*.runs/
+*.cache/
+*.ioplanning/
