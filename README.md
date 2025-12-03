@@ -104,3 +104,9 @@ I file principali del progetto sono:
 2.  Aprire il progetto in **Vivado**.
 3.  Simulare il file `TOP_CPU_tb.vhd` per osservare la corretta transizione degli stati.
 4.  Sintetizzare per la piattaforma FPGA di destinazione (specificare la board).
+
+---
+
+## 👤 Autore
+
+**Raffaele Petrolo** 
