@@ -135,7 +135,7 @@ I file principali del progetto sono:
 | **00B0** | (Dato) | `0x00B0` | Aggiunge 176 a `Rz`. `Rz` <= `Rz + 176`. |
 | **0005** | `OP_SUB` | `Rx` | Sottrazione immediata al registro `Rx`. |
 | **0001** | (Dato) | `0x0001` | Decrementa il contatore del loop. Risultato: `Rx` <= `Rx - 1`. |
-| **0308** | `OP_COMPARE` | `Rx, Ra` | Compara `Rx` con `Ra` (Ra = 0). Verifica la condizione di uscita del loop. |
+| **0308** | `OP_COMPARE` | `Rx, Ra` | Compara `Rx` con `Ra` (Ra = 0 di default). Verifica la condizione di uscita del loop. |
 | **0007** | `OP_JUMPNZ` | `-` | **Salto Condizionale:** Salta all'indirizzo dell'etichetta (`0009`) se l'ultimo risultato della comparazione non era Zero (cioè, se `Rx` > 0). |
 
 ---
