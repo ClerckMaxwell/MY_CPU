@@ -109,22 +109,34 @@ I file principali del progetto sono:
 
 ## 🧐 6. Opcode di esempio
 
-| Indirizzo (Esadecimale) | Codice Operativo | Operando / Dati | Descrizione dell'Operazione |
+| Indirizzo (Hex) | Codice Operativo | Operando / Dati (Hex) | Descrizione Dettagliata |
 | :---: | :--- | :--- | :--- |
-| **0218** | `OP_COMPARE` | `Ry, Rz` | Compara `Ry` (175) con `Rz` (175). **Risultato:** Setta il **FLAG Z** (Zero) a 1 perché sono uguali. |
+| **0012** | `OP_LOAD` | `Ry` | Carica un valore immediato nel registro `Ry` (Memory Data Register). |
+| **00AF** | (Dato) | `0x00AF` | Valore immediato: **175** (decimale). Risultato: `Ry` = 175. |
+| **0011** | `OP_STORE` | `Ry` | Salva il contenuto di `Ry` in Memoria. |
+| **0650** | (Dato) | `0x0650` | Indirizzo di memoria. Risultato: `MEM[0x0650]` <= 175. |
+| **0023** | `OP_LOADM` | `Rz` | Carica nel registro `Rz` un valore prelevato dalla memoria. |
+| **0650** | (Dato) | `0x0650` | Legge dall'indirizzo 0x0650. Risultato: `Rz` = 175. |
+| **021A** | `OP_ADDR` | `Ry, Rz` | Somma tra registri: `Ry` <= `Ry + Rz`. (175 + 175 = **350**). |
+| **021B** | `OP_SUBR` | `Ry, Rz` | Sottrazione tra registri: `Ry` <= `Ry - Rz`. (350 - 175 = **175**). |
+| **0014** | `OP_ADD` | `Ry` | Somma immediata al registro `Ry`. |
+| **0016** | (Dato) | `0x0016` | Valore: 22. Risultato: `Ry` <= `Ry + 22` (**197**). |
+| **0015** | `OP_SUB` | `Ry` | Sottrazione immediata al registro `Ry`. |
+| **0016** | (Dato) | `0x0016` | Valore: 22. Risultato: `Ry` <= `Ry - 22` (**175**). |
+| **0218** | `OP_COMPARE` | `Ry, Rz` | Compara `Ry` (175) con `Rz` (175). Risultato: Setta il **FLAG Z** (Zero) a 1. |
 | **0024** | `OP_ADD` | `Rz` | Somma immediata al registro `Rz`. |
-| **0001** | (Dato) | `0x0001` | Incrementa `Rz` di 1. **Risultato:** `Rz` = 176. |
-| **0218** | `OP_COMPARE` | `Ry, Rz` | Compara `Ry` (175) con `Rz` (176). **Risultato:** Setta il **FLAG NZ** (Non Zero) e probabilmente il **FLAG N** (Negative). |
-| **0002** | `OP_LOAD` | `Rx` | Carica un valore immediato nel registro `Rx` (Counter/Offset Register). |
-| **00B0** | (Dato) | `0x00B0` | **Valore:** 176. **Risultato:** `Rx` = 176. |
-| **0009** | `OP_LABEL` | `-` | **Etichetta di Salto:** Salva il Program Counter (PC) corrente per i salti futuri (Marca l'inizio del loop). |
+| **0001** | (Dato) | `0x0001` | Incrementa `Rz` di 1. Risultato: `Rz` = 176. |
+| **0218** | `OP_COMPARE` | `Ry, Rz` | Compara `Ry` (175) con `Rz` (176). Risultato: Setta **FLAG NZ** (Non Zero). |
+| **0002** | `OP_LOAD` | `Rx` | Carica un valore immediato nel registro `Rx` (Counter Register). |
+| **00B0** | (Dato) | `0x00B0` | Valore: 176. Risultato: `Rx` = 176. |
+| **0009** | `OP_LABEL` | `-` | **Etichetta di Salto** (Inizio Loop). Salva il PC corrente. |
 | **052C** | `OP_MOVE` | `Rc, Rz` | Sposta il valore da `Rz` a `Rc` (`Rc` <= `Rz`). |
 | **0024** | `OP_ADD` | `Rz` | Somma immediata al registro `Rz`. |
 | **00B0** | (Dato) | `0x00B0` | Aggiunge 176 a `Rz`. `Rz` <= `Rz + 176`. |
 | **0005** | `OP_SUB` | `Rx` | Sottrazione immediata al registro `Rx`. |
-| **0001** | (Dato) | `0x0001` | Decrementa il contatore del loop. **Risultato:** `Rx` <= `Rx - 1`. |
-| **0308** | `OP_COMPARE` | `Rx, Ra` | Compara `Rx` con `Ra` (assumendo `Ra` contenga 0 di default, verifica se il loop è finito). |
-| **0007** | `OP_JUMPNZ` | `-` | **Salto Condizionale:** Salta all'istruzione marcata da `OP_LABEL` (indirizzo salvato in **0009**) se il risultato dell'ultima comparazione (`COMPARE Rx, Ra`) **non** era Zero (cioè, se `Rx` > 0). |
+| **0001** | (Dato) | `0x0001` | Decrementa il contatore del loop. Risultato: `Rx` <= `Rx - 1`. |
+| **0308** | `OP_COMPARE` | `Rx, Ra` | Compara `Rx` con `Ra` (Ra = 0). Verifica la condizione di uscita del loop. |
+| **0007** | `OP_JUMPNZ` | `-` | **Salto Condizionale:** Salta all'indirizzo dell'etichetta (`0009`) se l'ultimo risultato della comparazione non era Zero (cioè, se `Rx` > 0). |
 
 ---
 
