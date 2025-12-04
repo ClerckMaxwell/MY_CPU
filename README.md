@@ -13,7 +13,7 @@ Questo progetto implementa un'unità di elaborazione centrale (**CPU**) custom a
 * **Larghezza Istruzione:** 16 bit.
 * **Formato Base:** `[Unused/Reg2] [Reg1] [Opcode]` (16 bit)
     * **Opcode (bit 0-3):** Definisce l'operazione (es. `LOAD`, `ADD`).
-    * **Reg1 (bit 4-7):** Solitamente il registro di **Destinazione** dell'operazione corrente.
+    * **Reg1 (bit 4-7):** Solitamente il registro a cui si riferisce l'operazione specificata (es. `LOAD`, `ADD`).
     * **Reg2 (bit 8-11):** Usato solitamente come registro di **Destinazione** di una `MOVE` o`ADDR`. Ignorato per operazioni immediate.
 
 | Opcode (Binario) | Hex | Nome | Funzione |
@@ -104,6 +104,37 @@ I file principali del progetto sono:
 2.  Aprire il progetto in **Vivado**.
 3.  Simulare il file `TOP_CPU_tb.vhd` per osservare la corretta transizione degli stati.
 4.  Sintetizzare per la piattaforma FPGA di destinazione (specificare la board).
+
+---
+
+## 🧐 6. Opcode tipico
+
+0012	OP_LOAD	 Ry Carica un valore immediato nel registro Ry (Memory Data Reg).
+00AF	(Dato)	0x00AF	Valore immediato: 175 (dec). Ora Ry = 175.
+0011	OP_STORE	Ry	Salva il contenuto di Ry in Memoria.
+0650	(Dato)	0x0650	Indirizzo di memoria: MEM[0x0650] <= Ry.
+0023	OP_LOADM	Rz	Carica nel registro Rz un valore prelevato dalla memoria.
+0650	(Dato)	0x0650	Legge dall'indirizzo 0x0650. Ora Rz = MEM[0x0650] (quindi Rz = 175).
+021a	OP_ADDR	 Ry, Rz 	Somma tra registri: Ry <= Ry + Rz. (175 + 175 = 350).
+021b	 OP_SUBR	Ry, Rz	Sottrazione tra registri: Ry <= Ry - Rz. (350 - 175 = 175). Ry torna al valore originale.
+0014	 OP_ADD Ry	Somma immediata al registro Ry.
+0016	(Dato)	0x0016	Valore: 22. Ry <= Ry + 22 (175 + 22 = 197).
+0015	 OP_SUB Ry	Sottrazione immediata al registro Ry.
+0016	(Dato)	0x0016	Valore: 22. Ry <= Ry - 22 (197 - 22 = 175).
+0218	 OP_COMPARE Ry, Rz Compara Ry con Rz. (175 vs 175). Setta il FLAG Z (Zero) a 1 perché sono uguali.
+0024	OP_ADD	Rz	Somma immediata al registro Rz.
+0001	(Dato)	0x0001	Incrementa Rz di 1. Ora Rz = 176.
+0218	 OP_COMPARE Ry, Rz Compara Ry (175) con Rz (176). Setta FLAG NZ (Non Zero) e probabilmente FLAG N (Negative).
+0002 OP_LOAD Rx	Carica un valore immediato nel registro Rx (Counter/Offset Reg).
+00B0	(Dato)	0x00B0	Valore: 176. Ora Rx = 176.
+0009	OP_LABEL	-	Etichetta di salto. Salva il PC corrente per i salti futuri (Inizio Loop).
+052c	OP_MOVE	 Rc, Rz 	Sposta il valore da Rz a Rc (Rc <= Rz)
+0024 OP_ADD	Rz	Somma immediata al registro Rz.
+00B0	(Dato)	0x00B0	Aggiunge 176 a Rz. Rz <= Rz + 176.
+0005	 OP_SUB	 Rx	Sottrazione immediata al registro Rx.
+0001	(Dato)	0x0001	Decrementa Rx di 1 (Counter loop).
+0308 	OP_COMPARE	Rx, Ra	Compara Rx con Ra (Ra contiene 0 di default).
+0007	OP_JUMPNZ	-	Salta all'istruzione LABEL (indirizzo salvato in 0009) se il risultato della comparazione non era Zero.
 
 ---
 
