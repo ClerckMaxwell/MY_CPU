@@ -1,145 +1,146 @@
-# 💻 CPU a 16-bit basata su Macchina a Stati Finiti (FSM)
+# 💻 16-bit CPU based on Finite State Machine (FSM)
 
-## 📌 1. Panoramica del Progetto
+## 📌 1. Project Overview
 
-Questo progetto implementa un'unità di elaborazione centrale (**CPU**) custom a **16 bit** interamente descritta in **VHDL**, destinata all'implementazione su FPGA (tramite Vivado). L'architettura utilizza una **Macchina a Stati Finiti (FSM)** per controllare il ciclo di Fetch-Execute, permettendo l'esecuzione di istruzioni in **più cicli di clock** (architettura multiciclo).
+This project implements a custom **16-bit Central Processing Unit (CPU)** entirely described in **VHDL**, intended for FPGA implementation (using Vivado). The architecture uses a **Finite State Machine (FSM)** to control the Fetch-Execute cycle, allowing instructions to be executed over **multiple clock cycles** (multicycle architecture).
 
 ---
 
-## 🏗️ 2. Architettura della CPU
+## 🏗️ 2. CPU Architecture
 
-### 2.1 Set di Istruzioni (Instruction Set Architecture - ISA)
+### 2.1 Instruction Set Architecture (ISA)
 
-* **Larghezza Istruzione:** 16 bit.
-* **Formato Base:** `[Unused/Reg2] [Reg1] [Opcode]` (16 bit)
-    * **Opcode (bit 0-3):** Definisce l'operazione (es. `LOAD`, `ADD`).
-    * **Reg1 (bit 4-7):** Solitamente il registro a cui si riferisce l'operazione specificata (es. `LOAD`, `ADD`).
-    * **Reg2 (bit 8-11):** Usato solitamente come registro di **Destinazione** di una `MOVE` o`ADDR`. Ignorato per operazioni immediate.
+* **Instruction Width:** 16 bits.
+* **Base Format:** `[Unused/Reg2] [Reg1] [Opcode]` (16 bits)
+    * **Opcode (bits 0-3):** Defines the operation (e.g., `LOAD`, `ADD`).
+    * **Reg1 (bits 4-7):** Typically the register referenced by the specified operation (e.g., `LOAD`, `ADD`).
+    * **Reg2 (bits 8-11):** Typically used as the **Destination** register for `MOVE` or `ADDR`. Ignored for immediate operations.
 
-| Opcode (Binario) | Hex | Nome | Funzione |
+| Opcode (Binary) | Hex | Name | Function |
 | :---: | :---: | :---: | :--- |
-| `0001` | 1 | **STORE** | Salva il contenuto di un Registro in Memoria. |
-| `0010` | 2 | **LOAD** | Carica un Valore Immediato in un Registro. |
-| `0011` | 3 | **LOADM** | Carica un valore da Memoria in un Registro (Indiretto). |
-| `0100` | 4 | **ADD** | Somma un Valore Immediato a un Registro. |
-| `0101` | 5 | **SUB** | Sottrae un Valore Immediato da un Registro. |
-| `0110` | 6 | **JUMPZ** | Salta a LABEL se il Flag Z (Zero) è alto. |
-| `0111` | 7 | **JUMPNZ**| Salta a LABEL se il Flag NZ (Non-Zero) è alto. |
-| `1000` | 8 | **COMPARE** | Compara due Registri e aggiorna i Flag di condizione. |
-| `1001` | 9 | **LABEL** | Definisce un punto di salto (salva l'indirizzo PC). |
-| `1010` | A | **ADDR** | Somma tra due Registri (`Rx = Rx + Ry`). |
-| `1011` | B | **SUBR** | Sottrazione tra due Registri (`Rx = Rx - Ry`). |
-| `1100` | C | **MOVE** | Sposta il valore da un Registro a un altro (`Rx = Ry`). |
+| `0000` | 0 | **FETCH** | Do nothing |
+| `0001` | 1 | **STORE** | Stores the content of a Register into Memory. |
+| `0010` | 2 | **LOAD** | Loads an Immediate Value into a Register. |
+| `0011` | 3 | **LOADM** | Loads a value from Memory into a Register (Indirect). |
+| `0100` | 4 | **ADD** | Adds an Immediate Value to a Register. |
+| `0101` | 5 | **SUB** | Subtracts an Immediate Value from a Register. |
+| `0110` | 6 | **JUMPZ** | Jumps to LABEL if the Z (Zero) Flag is high. |
+| `0111` | 7 | **JUMPNZ**| Jumps to LABEL if the NZ (Non-Zero) Flag is high. |
+| `1000` | 8 | **COMPARE** | Compares two Registers and updates the Condition Flags. |
+| `1001` | 9 | **LABEL** | Defines a jump point (saves the PC address). |
+| `1010` | A | **ADDR** | Addition between two Registers (`Rx = Rx + Ry`). |
+| `1011` | B | **SUBR** | Subtraction between two Registers (`Rx = Rx - Ry`). |
+| `1100` | C | **MOVE** | Moves the value from one Register to another (`Rx = Ry`). |
 
 ### 2.2 Register File
 
-Il set di registri è composto da **6 registri generici a 16 bit** (`RX`, `RY`, `RZ`, `RA`, `RB`, `RC`).
+The register set consists of **6 general-purpose 16-bit registers** (`RX`, `RY`, `RZ`, `RA`, `RB`, `RC`).
 
-| Registro | Identificativo (Binario) | 
-| :---: | :---: | 
-| **RX** | `0000` | 
-| **RY** | `0001` | 
+| Register | Identifier (Binary) |
+| :---: | :---: |
+| **RX** | `0000` |
+| **RY** | `0001` |
 | **RZ** | `0010` |
-| **RA** | `0011` | 
-| **RB** | `0100` | 
+| **RA** | `0011` |
+| **RB** | `0100` |
 | **RC** | `0101` |
 
-### 2.3 Flag di Condizione
+### 2.3 Condition Flags
 
-La CPU gestisce quattro flag di condizione che vengono aggiornati dalle istruzioni `COMPARE` e utilizzati dalle istruzioni di salto.
+The CPU manages four condition flags that are updated by `COMPARE` instructions and used by jump instructions.
 
-* **Z (Zero):** Settato se il risultato dell'ultima operazione è zero.
-* **NZ (Non-Zero):** Settato se il risultato non è zero.
-* **N (Negative):** Settato se il risultato è negativo.
-* **P (Positive):** Settato se il risultato è positivo.
+* **Z (Zero):** Set if the result of the last operation is zero.
+* **NZ (Non-Zero):** Set if the result is not zero.
+* **N (Negative):** Set if the result is negative.
+* **P (Positive):** Set if the result is positive.
 
 ---
 
-## ⚙️ 3. Macchina a Stati Finiti (FSM) - Logica di Controllo
+## ⚙️ 3. Finite State Machine (FSM) - Control Logic
 
-La FSM è il cuore della CPU, gestendo il flusso di esecuzione delle istruzioni in più cicli.
+The FSM is the core of the CPU, managing the multicycle instruction execution flow.
 
-### 3.1 Stati Principali (Fasi di Esecuzione)
+### 3.1 Main States (Execution Phases)
 
-La FSM opera su una logica multiciclo, controllata dai seguenti stati:
+The FSM operates on a multicycle logic, controlled by the following states:
 
-| Stato VHDL | Descrizione | Funzione |
+| VHDL State | Description | Function |
 | :---: | :--- | :--- |
-| `init` | Inizializzazione | Resetta tutti i registri e il Program Counter (PC). |
-| `execute` | **Fetch & Decode** | Preleva l'istruzione in `DATA_IN`, decodifica e imposta i flag di controllo. |
-| `wait_address` | Gestione Memoria (Fase 1) | Attende l'indirizzo da utilizzare (`STORE` o `LOADM`). |
-| `wait_data` | Gestione ALU (Immediato) | Invia l'operando immediato alla ALU (gestendo anche il complemento a uno per la sottrazione). |
-| `write_reg` | Write-Back | Scrive il risultato finale (ALU/Memoria/Dato) nel registro di destinazione. |
-| `write_mem` | Scrittura Memoria | Ciclo dedicato all'invio del dato sulla bus dati per l'operazione `STORE`. |
-| `compare` | Aggiornamento Flag | Ciclo dedicato all'aggiornamento dei flag di condizione. |
-| `wait_generic` | Sincronizzazione | Stato di transizione usato per mantenere i segnali di controllo attivi durante i ritardi. |
+| `init` | Initialization | Resets all registers and the Program Counter (PC). |
+| `execute` | **Fetch & Decode** | Fetches the instruction in `DATA_IN`, decodes it, and sets control flags. |
+| `wait_address` | Memory Management (Phase 1) | Waits for the address to be used (`STORE` or `LOADM`). |
+| `wait_data` | ALU Management (Immediate) | Sends the immediate operand to the ALU (also handles one's complement for subtraction). |
+| `write_reg` | Write-Back | Writes the final result (ALU/Memory/Data) to the destination register. |
+| `write_mem` | Memory Write | Dedicated cycle for sending the data onto the data bus for the `STORE` operation. |
+| `compare` | Flag Update | Dedicated cycle for updating the condition flags. |
+| `wait_generic` | Synchronization | Transition state used to keep control signals active during delays. |
 
-### 3.2 Persistenza dei Segnali (Il segreto multiciclo)
+### 3.2 Signal Persistence (The Multicycle Secret)
 
-La chiave per la corretta sequenza di esecuzione in questa architettura è la **persistenza dei segnali di controllo** (`flag_alu`, `flag_sub`, `flag_reg`).
+The key to the correct execution sequence in this architecture is the **persistence of control signals** (`flag_alu`, `flag_sub`, `flag_reg`).
 
-Questi flag sono implementati come registri all'interno dell'FSM e vengono **azzerati solo ed esclusivamente all'inizio dello stato `execute`**. Questo meccanismo assicura che lo stato `write_reg` (che avviene diversi cicli dopo) "ricordi" se deve scrivere un risultato proveniente dalla **ALU** (`ALU_REG`) o un valore letto dalla Memoria (`DATA_IN`).
+These flags are implemented as registers within the FSM and are **cleared only at the beginning of the `execute` state**. This mechanism ensures that the `write_reg` state (which occurs several cycles later) "remembers" whether it should write a result coming from the **ALU** (`ALU_REG`) or a value read from Memory (`DATA_IN`).
 
 ---
 
-## 📂 4. Struttura dei File
+## 📂 4. File Structure
 
-I file principali del progetto sono:
+The main files of the project are:
 
-* `FSM.vhd`: Contiene la Macchina a Stati Finiti (FSM) che controlla il flusso i registri si cache e il PC.
-* `cpu_defs.vhd`: Package contenente tutte le costanti di Opcode e le definizioni dei Registri (es. `REG_O`, `FLAG_M`).
+* `FSM.vhd`: Contains the Finite State Machine (FSM) that controls the flow, cache registers, and the PC.
+* `cpu_defs.vhd`: Package containing all Opcode constants and Register definitions (e.g., `RX`, `FLAG_RX`).
 * `ALU.vhd`
-* `blk_mem_gen_0.vhd`: Modulo della RAM per contenere le istruzioni.
-* `TOP_CPU.vhd`: Integra FSM, ALU e Memoria.
-* `.gitignore`: **Cruciale** per ignorare tutti i file di log, sintesi e simulazione generati da Vivado.
+* `blk_mem_gen_0.vhd`: The RAM module to hold the instructions.
+* `TOP_CPU.vhd`: Integrates the FSM, ALU, and Memory.
+* `.gitignore`: **Crucial** for ignoring all log, synthesis, and simulation files generated by Vivado.
 
 ---
 
-## 🛠️ 5. Utilizzo e Test
+## 🛠️ 5. Usage and Testing
 
-1.  Clonare la repository:
+1.  Clone the repository:
     ```bash
     git clone [URL]
     ```
-2.  Aprire il progetto in **Vivado**.
-3.  Simulare il file `TOP_CPU_tb.vhd` per osservare la corretta transizione degli stati.
-4.  Sintetizzare per la piattaforma FPGA di destinazione (specificare la board).
+2.  Open the project in **Vivado**.
+3.  Simulate the `TOP_CPU_tb.vhd` file to observe the correct state transitions.
+4.  Synthesize for the target FPGA platform (specify the board).
 
 ---
 
-## 🧐 6. Opcode di esempio
+## 🧐 6. Example Opcodes
 
-| Indirizzo (Hex) | Codice Operativo | Operando / Dati (Hex) | Descrizione Dettagliata |
+| Address (Hex) | Opcode | Operand / Data (Hex) | Detailed Description |
 | :---: | :--- | :--- | :--- |
-| **0012** | `OP_LOAD` | `Ry` | Carica un valore immediato nel registro `Ry` (Memory Data Register). |
-| **00AF** | (Dato) | `0x00AF` | Valore immediato: **175** (decimale). Risultato: `Ry` = 175. |
-| **0011** | `OP_STORE` | `Ry` | Salva il contenuto di `Ry` in Memoria. |
-| **0650** | (Dato) | `0x0650` | Indirizzo di memoria. Risultato: `MEM[0x0650]` <= 175. |
-| **0023** | `OP_LOADM` | `Rz` | Carica nel registro `Rz` un valore prelevato dalla memoria. |
-| **0650** | (Dato) | `0x0650` | Legge dall'indirizzo 0x0650. Risultato: `Rz` = 175. |
-| **021A** | `OP_ADDR` | `Ry, Rz` | Somma tra registri: `Ry` <= `Ry + Rz`. (175 + 175 = **350**). |
-| **021B** | `OP_SUBR` | `Ry, Rz` | Sottrazione tra registri: `Ry` <= `Ry - Rz`. (350 - 175 = **175**). |
-| **0014** | `OP_ADD` | `Ry` | Somma immediata al registro `Ry`. |
-| **0016** | (Dato) | `0x0016` | Valore: 22. Risultato: `Ry` <= `Ry + 22` (**197**). |
-| **0015** | `OP_SUB` | `Ry` | Sottrazione immediata al registro `Ry`. |
-| **0016** | (Dato) | `0x0016` | Valore: 22. Risultato: `Ry` <= `Ry - 22` (**175**). |
-| **0218** | `OP_COMPARE` | `Ry, Rz` | Compara `Ry` (175) con `Rz` (175). Risultato: Setta il **FLAG Z** (Zero) a 1. |
-| **0024** | `OP_ADD` | `Rz` | Somma immediata al registro `Rz`. |
-| **0001** | (Dato) | `0x0001` | Incrementa `Rz` di 1. Risultato: `Rz` = 176. |
-| **0218** | `OP_COMPARE` | `Ry, Rz` | Compara `Ry` (175) con `Rz` (176). Risultato: Setta **FLAG NZ** (Non Zero). |
-| **0002** | `OP_LOAD` | `Rx` | Carica un valore immediato nel registro `Rx` (Counter Register). |
-| **00B0** | (Dato) | `0x00B0` | Valore: 176. Risultato: `Rx` = 176. |
-| **0009** | `OP_LABEL` | `-` | **Etichetta di Salto** (Inizio Loop). Salva il PC corrente. |
-| **052C** | `OP_MOVE` | `Rc, Rz` | Sposta il valore da `Rz` a `Rc` (`Rc` <= `Rz`). |
-| **0024** | `OP_ADD` | `Rz` | Somma immediata al registro `Rz`. |
-| **00B0** | (Dato) | `0x00B0` | Aggiunge 176 a `Rz`. `Rz` <= `Rz + 176`. |
-| **0005** | `OP_SUB` | `Rx` | Sottrazione immediata al registro `Rx`. |
-| **0001** | (Dato) | `0x0001` | Decrementa il contatore del loop. Risultato: `Rx` <= `Rx - 1`. |
-| **0308** | `OP_COMPARE` | `Rx, Ra` | Compara `Rx` con `Ra` (Ra = 0 di default). Verifica la condizione di uscita del loop. |
-| **0007** | `OP_JUMPNZ` | `-` | **Salto Condizionale:** Salta all'indirizzo dell'etichetta (`0009`) se l'ultimo risultato della comparazione non era Zero (cioè, se `Rx` > 0). |
+| **0012** | `OP_LOAD` | `Ry` | Loads an immediate value into register `Ry` (Memory Data Register). |
+| **00AF** | (Data) | `0x00AF` | Immediate value: **175** (decimal). Result: `Ry` = 175. |
+| **0011** | `OP_STORE` | `Ry` | Stores the content of `Ry` into Memory. |
+| **0650** | (Data) | `0x0650` | Memory address. Result: `MEM[0x0650]` = 175. |
+| **0023** | `OP_LOADM` | `Rz` | Loads a value fetched from memory into register `Rz`. |
+| **0650** | (Data) | `0x0650` | Reads from address 0x0650. Result: `Rz` = 175. |
+| **021A** | `OP_ADDR` | `Ry, Rz` | Register Addition: `Ry` = `Ry + Rz`. (175 + 175 = **350**). |
+| **021B** | `OP_SUBR` | `Ry, Rz` | Register Subtraction: `Ry` = `Ry - Rz`. (350 - 175 = **175**). |
+| **0014** | `OP_ADD` | `Ry` | Immediate addition to register `Ry`. |
+| **0016** | (Data) | `0x0016` | Value: 22. Result: `Ry` = `Ry + 22` (**197**). |
+| **0015** | `OP_SUB` | `Ry` | Immediate subtraction from register `Ry`. |
+| **0016** | (Data) | `0x0016` | Value: 22. Result: `Ry` = `Ry - 22` (**175**). |
+| **0218** | `OP_COMPARE` | `Ry, Rz` | Compares `Ry` (175) with `Rz` (175). Result: Sets the **Z FLAG** (Zero) to 1. |
+| **0024** | `OP_ADD` | `Rz` | Immediate addition to register `Rz`. |
+| **0001** | (Data) | `0x0001` | Increments `Rz` by 1. Result: `Rz` = 176. |
+| **0218** | `OP_COMPARE` | `Ry, Rz` | Compares `Ry` (175) with `Rz` (176). Result: Sets **NZ FLAG** (Non Zero). |
+| **0002** | `OP_LOAD` | `Rx` | Loads an immediate value into register `Rx` (Counter Register). |
+| **00B0** | (Data) | `0x00B0` | Value: 176. Result: `Rx` = 176. |
+| **0009** | `OP_LABEL` | `-` | **Jump Label** (Start Loop). Saves the current PC. |
+| **052C** | `OP_MOVE` | `Rc, Rz` | Moves the value from `Rz` to `Rc` (`Rc` = `Rz`). |
+| **0024** | `OP_ADD` | `Rz` | Immediate addition to register `Rz`. |
+| **00B0** | (Data) | `0x00B0` | Adds 176 to `Rz`. `Rz` = `Rz + 176`. |
+| **0005** | `OP_SUB` | `Rx` | Immediate subtraction from register `Rx`. |
+| **0001** | (Data) | `0x0001` | Decrements the loop counter. Result: `Rx` = `Rx - 1`. |
+| **0308** | `OP_COMPARE` | `Rx, Ra` | Compares `Rx` with `Ra` (Ra = 0 by default). Checks the loop exit condition. |
+| **0007** | `OP_JUMPNZ` | `-` | **Conditional Jump:** Jumps to the label address (`0009`) if the last comparison result was not Zero (i.e., if `Rx` > 0). |
 
 ---
 
-## 👤 Autore
+## 👤 Author
 
-**Raffaele Petrolo** 
+**Raffaele Petrolo**
