@@ -4,9 +4,9 @@
 
 This project implements a custom 16-bit Central Processing Unit (CPU) entirely described in VHDL, intended for FPGA implementation (using Vivado).
 
-The entire architecture was developed autonomously from scratch, starting from the VHDL description of the fundamental logic components, such as Full Adders, Ripple Carry stages, and complete Adder circuits.
+The entire architecture was developed **autonomously** from scratch, starting from the VHDL description of the fundamental logic components, such as Full Adders, Ripple Carry stages, and complete Adder circuits.
 
-The CPU utilizes a Finite State Machine (FSM) to control the Fetch-Execute cycle, allowing instructions to be executed over multiple clock cycles. Furthermore, I defined a custom Instruction Set and created its corresponding Opcode, which is complete with conditional instructions and jumps, enabling the implementation of complex control logic. This ensures full mastery over every aspect of the unit's functionality.
+The CPU utilizes a Finite State Machine (FSM) to control the Fetch-Execute cycle, allowing instructions to be executed over multiple clock cycles. Furthermore, I defined a **custom Instruction Set** and created its corresponding Opcode, which is **complete** with **conditional instructions** and **jumps**, enabling the implementation of complex control logic. This ensures full mastery over every aspect of the unit's functionality.
 
 ---
 
