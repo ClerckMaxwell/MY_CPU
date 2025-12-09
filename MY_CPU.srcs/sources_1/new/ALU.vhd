@@ -1,3 +1,4 @@
+--This project was done by Raffaele Petrolo (class 2002), Electronic Engineering student at University of Calabria.
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 

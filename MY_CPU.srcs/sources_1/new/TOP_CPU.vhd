@@ -1,3 +1,10 @@
+--This project was done by Raffaele Petrolo (class 2002), Electronic Engineering student at 
+--University of Calabria. It tooks only a week, and i think everyone could do it,
+--i mean, i just thought a machine that could possibly follow some instructioins and this 
+--is the result.
+--I remember when i was a child when Computers seems black magic to me, and now i'm able to build my own.
+--This makes me think how much time is gone, we all grow up and I didn't even notice it
+--Enjoy every moment, you'll miss most of them
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -36,17 +43,6 @@ component FSM is
         compare_alu      : out std_logic
     ); 
 end component;
-
---component memory is 
---port(
---        clk      : in  std_logic;
---        read     : in  std_logic;
---        write    : in  std_logic;
---        address  : in  std_logic_vector(15 downto 0);
---        data_in  : in  std_logic_vector(15 downto 0);
---        data_out : out std_logic_vector(15 downto 0)
---    );
---end component;
 
 component blk_mem_gen_0 IS
   PORT (

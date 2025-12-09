@@ -1,3 +1,4 @@
+--This project was done by Raffaele Petrolo (class 2002), Electronic Engineering student at University of Calabria.
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -430,13 +431,6 @@ when OP_MOVE =>
                     ADDRESS <= PC; 
                     PC      <= PC + 1;
                     state <= execute;
-                    -- Selezione del dato da scrivere in base ai flag
---                    if (flag_pickup = '1') then
---                         state <= execute; -- Se pickup, il PC è già stato incrementato prima o gestito diversamente
---                    else
---                         state <= execute;
---                    end if;
-
                     -- Gestione scrittura registri (logica unificata)
                     case flags is
                         when FLAG_RX => 

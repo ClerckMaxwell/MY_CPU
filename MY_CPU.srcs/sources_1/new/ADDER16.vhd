@@ -1,3 +1,4 @@
+--This project was done by Raffaele Petrolo (class 2002), Electronic Engineering student at University of Calabria.
 library IEEE; 
 use IEEE.STD_LOGIC_1164.ALL; 
 use IEEE.STD_LOGIC_UNSIGNED.ALL; 
@@ -8,7 +9,7 @@ Cin : in std_logic;
 Sum : out std_logic_vector (16 downto 0)); 
 end ADDER16; 
 
-architecture CSA of ADDER16 is 
+architecture Behavioral of ADDER16 is 
 signal C_int : std_logic_vector(4 downto 0); 
 
 component RCA_4BIT is 
@@ -28,4 +29,4 @@ end generate;
 
 Sum(16)<= C_int(4); 
 
-end CSA;
+end Behavioral;
