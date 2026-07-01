@@ -119,9 +119,9 @@ The main files of the project are:
 | **0012** | `OP_LOAD` | `Ry` | Loads an immediate value into register `Ry` (Memory Data Register). |
 | **00AF** | (Data) | `0x00AF` | Immediate value: **175** (decimal). Result: `Ry` = 175. |
 | **0011** | `OP_STORE` | `Ry` | Stores the content of `Ry` into Memory. |
-| **0650** | (Data) | `0x0650` | Memory address. Result: `MEM[0x0650]` = 175. |
+| **0650** | (Address) | `0x0650` | Memory address. Result: `MEM[0x0650]` = 175. |
 | **0023** | `OP_LOADM` | `Rz` | Loads a value fetched from memory into register `Rz`. |
-| **0650** | (Data) | `0x0650` | Reads from address 0x0650. Result: `Rz` = 175. |
+| **0650** | (Address) | `0x0650` | Reads from address 0x0650. Result: `Rz` = 175. |
 | **021A** | `OP_ADDR` | `Ry, Rz` | Register Addition: `Ry` = `Ry + Rz`. (175 + 175 = **350**). |
 | **021B** | `OP_SUBR` | `Ry, Rz` | Register Subtraction: `Ry` = `Ry - Rz`. (350 - 175 = **175**). |
 | **0014** | `OP_ADD` | `Ry` | Immediate addition to register `Ry`. |
