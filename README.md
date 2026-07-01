@@ -114,7 +114,7 @@ The main files of the project are:
 
 ## 🧐 6. Example Opcodes
 
-| Address (Hex) | Opcode | Operand / Data (Hex) | Detailed Description |
+| Raw Opcode (Hex) | Opcode | Operand / Data (Hex) | Detailed Description |
 | :---: | :--- | :--- | :--- |
 | **0012** | `OP_LOAD` | `Ry` | Loads an immediate value into register `Ry` (Memory Data Register). |
 | **00AF** | (Data) | `0x00AF` | Immediate value: **175** (decimal). Result: `Ry` = 175. |
