@@ -122,8 +122,8 @@ The main files of the project are:
 | **0650** | (Address) | `0x0650` | Memory address. Result: `MEM[0x0650]` = 175. |
 | **0023** | `OP_LOADM` | `Rz` | Loads a value fetched from memory into register `Rz`. |
 | **0650** | (Address) | `0x0650` | Reads from address 0x0650. Result: `Rz` = 175. |
-| **021A** | `OP_ADDR` | `Ry, Rz` | Register Addition: `Ry` = `Ry + Rz`. (175 + 175 = **350**). |
-| **021B** | `OP_SUBR` | `Ry, Rz` | Register Subtraction: `Ry` = `Ry - Rz`. (350 - 175 = **175**). |
+| **021A** | `OP_ADDR` | `Rz, Ry` | Register Addition: `Rz` = `Rz + Ry`. (175 + 175 = **350**). |
+| **021B** | `OP_SUBR` | `Rz, Ry` | Register Subtraction: `Rz` = `Rz - Ry`. (350 - 175 = **175**). |
 | **0014** | `OP_ADD` | `Ry` | Immediate addition to register `Ry`. |
 | **0016** | (Data) | `0x0016` | Value: 22. Result: `Ry` = `Ry + 22` (**197**). |
 | **0015** | `OP_SUB` | `Ry` | Immediate subtraction from register `Ry`. |
