@@ -1,25 +1,25 @@
-# Vivado generated files
+# Vivado generated files — keep source project and IP configuration
 *.jou
 *.log
-*.wdb
 *.str
-*.pb
-*.os
-*.jou
-*.zip
 .Xil/
-hd_visual/
-xsim.dir/
-
-# Synthesis and implementation results (optional: remove if you want to keep bitstream)
-*.bit
-*.bin
-*.dcp
-
-# Project specific
-*.ip_user_files/
-*.hw/
-*.sim/
-*.runs/
 *.cache/
-*.ioplanning/
+*.runs/
+*.sim/
+*.hw/
+*.ip_user_files/
+*.gen/
+*.tmp/
+*.backup/
+*.dcp
+*.wdb
+*.vcd
+__pycache__/
+*.pyc
+# Generated verification outputs
+trace_*.csv
+final_state.json
+# Generated BRAM programs (source .asm remains tracked)
+programs/*.coe
+programs/*.mem
+programs/*.hex

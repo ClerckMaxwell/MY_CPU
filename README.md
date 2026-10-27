@@ -1,87 +1,91 @@
-# 💻 16-bit CPU based on Finite State Machine (FSM)
+# MY_CPU — Custom 16-bit VHDL processor
 
-## 📌 1. Project Overview
+A custom 16-bit, multi-cycle CPU implemented in VHDL, with its own instruction set, Python assembler, instruction-level reference simulator, and automated RTL-vs-software trace comparison.
 
-This project implements a custom 16-bit Central Processing Unit (CPU) entirely described in VHDL, intended for FPGA implementation (using Vivado).
+> **Verification milestone:** 30 retired instructions matched between the Python reference model and Vivado for the instruction word, all six registers, and all four flags. This is a single-program regression result, **not** exhaustive verification or proof of timing closure.
 
-The entire architecture was developed **autonomously** from scratch, starting from the VHDL description of the fundamental logic components, such as Full Adders, Ripple Carry stages, and complete Adder circuits.
+## Architecture
 
-The CPU utilizes a Finite State Machine (FSM) to control the Fetch-Execute cycle, allowing instructions to be executed over multiple clock cycles. Furthermore, I defined a **custom Instruction Set** and created its corresponding Opcode, which is **complete** with **conditional instructions** and **jumps**, enabling the implementation of complex control logic. This ensures full mastery over every aspect of the unit's functionality.
+- Six 16-bit registers: `RX`, `RY`, `RZ`, `RA`, `RB`, `RC`.
+- Multi-cycle control FSM and a custom arithmetic / comparison datapath.
+- Shared memory via Xilinx Block Memory Generator IP.
+- Immediate and register arithmetic, memory access, comparison, register moves.
+- Hardware loop-address stack (three nested levels as currently implemented).
+- Absolute conditional jumps encoded with a 12-bit target: `JUMPIZ` (`0xD`) and `JUMPINZ` (`0xE`).
+- `instruction_retired` pulse to capture architectural state after each completed instruction.
 
----
+The instruction word has a 4-bit opcode in bits `[3:0]`. Register-to-register operations encode the destination in bits `[11:8]` and source in `[7:4]`. Immediate memory instructions can occupy two 16-bit words. For an example, `052C` means `MOVE RC, RZ`, and `021A` means `ADDR RZ, RY`.
 
-## 🏗️ 2. CPU Architecture
+## Repository layout
 
-### 2.1 Instruction Set Architecture (ISA)
+```text
+MY_CPU/
+├── MY_CPU.xpr                  # Existing Vivado project: keep at root
+├── MY_CPU.srcs/               # Existing Vivado RTL/IP/simulation sources
+├── README.md
+├── .gitignore
+├── tools/
+│   ├── assembler/assembler.py
+│   ├── simulator/{simulator.py,smoke_test.py}
+│   └── verification/{convert_vivado_trace.py,compare_traces.py,TOP_CPU_tb_example.vhd}
+├── programs/{esempio.asm,salti.asm}
+└── docs/{TOOLCHAIN.md,VERIFICATION.md}
+```
 
-* **Instruction Width:** 16 bits.
-* **Base Format:** `[Unused/Reg2] [Reg1] [Opcode]` (16 bits)
-    * **Opcode (bits 0-3):** Defines the operation (e.g., `LOAD`, `ADD`).
-    * **Reg1 (bits 4-7):** Typically the register referenced by the specified operation (e.g., `LOAD`, `ADD`).
-    * **Reg2 (bits 8-11):** Typically used as the **Destination** register for `MOVE` or `ADDR`. Ignored for immediate operations.
+**Migration note:** `tools/`, `programs/` and `docs/` are additions to the current Vivado repository. **Do not move `MY_CPU.xpr`, `MY_CPU.srcs` or the Block Memory Generator IP paths blindly:** Vivado 2018.3 can retain path-dependent IP references. `TOP_CPU_tb_example.vhd` is a reference copy; use your already working Vivado testbench as the source of truth and port any improvements to it.
 
-| Opcode (Binary) | Hex | Name | Function |
-| :---: | :---: | :---: | :--- |
-| `0000` | 0 | **FETCH** | Do nothing |
-| `0001` | 1 | **STORE** | Stores the content of a Register into Memory. |
-| `0010` | 2 | **LOAD** | Loads an Immediate Value into a Register. |
-| `0011` | 3 | **LOADM** | Loads a value from Memory into a Register (Indirect). |
-| `0100` | 4 | **ADD** | Adds an Immediate Value to a Register. |
-| `0101` | 5 | **SUB** | Subtracts an Immediate Value from a Register. |
-| `0110` | 6 | **JUMPZ** | Jumps to LABEL if the Z (Zero) Flag is high. |
-| `0111` | 7 | **JUMPNZ**| Jumps to LABEL if the NZ (Non-Zero) Flag is high. |
-| `1000` | 8 | **COMPARE** | Compares two Registers and updates the Condition Flags. |
-| `1001` | 9 | **LABEL** | Defines a jump point (saves the PC address). |
-| `1010` | A | **ADDR** | Addition between two Registers (`Rx = Rx + Ry`). |
-| `1011` | B | **SUBR** | Subtraction between two Registers (`Rx = Rx - Ry`). |
-| `1100` | C | **MOVE** | Moves the value from one Register to another (`Rx = Ry`). |
+## Quick start
 
-### 2.2 Register File
+Requirements: Python 3, no third-party Python packages for these scripts; Vivado 2018.3 for RTL simulation.
 
-The register set consists of **6 general-purpose 16-bit registers** (`RX`, `RY`, `RZ`, `RA`, `RB`, `RC`).
+From the repository root:
 
-| Register | Identifier (Binary) |
-| :---: | :---: |
-| **RX** | `0000` |
-| **RY** | `0001` |
-| **RZ** | `0010` |
-| **RA** | `0011` |
-| **RB** | `0100` |
-| **RC** | `0101` |
+```bash
+# Assembly -> .coe for the Vivado block RAM
+python tools/assembler/assembler.py programs/esempio.asm -o programs/esempio.coe --symbols
 
-### 2.3 Condition Flags
+# Instruction-level software model -> CSV + JSON
+python tools/simulator/simulator.py programs/esempio.coe --max-steps 100 --trace trace_python.csv --state final_state.json
 
-The CPU manages four condition flags that are updated by `COMPARE` instructions and used by jump instructions.
+# Built-in Python smoke tests
+python tools/simulator/smoke_test.py
+```
 
-* **Z (Zero):** Set if the result of the last operation is zero.
-* **NZ (Non-Zero):** Set if the result is not zero.
-* **N (Negative):** Set if the result is negative.
-* **P (Positive):** Set if the result is positive.
+Run the Behavioral Simulation using your project testbench. It should write `trace_vivado.csv` (usually inside the XSim working directory). Then:
 
----
+```bash
+python tools/verification/convert_vivado_trace.py trace_vivado.csv trace_vivado_converted.csv
+python tools/verification/compare_traces.py trace_python.csv trace_vivado_converted.csv --fields word RX RY RZ RA RB RC Z NZ N P
+```
 
-## ⚙️ 3. Finite State Machine (FSM) - Control Logic
+Do **not** compare the Vivado internal `PC` directly with the Python `next_pc`: the FSM prefetches memory and those signals have different meanings. The instruction word comparison helps validate the instruction sequence without imposing an incorrect PC offset.
 
-The FSM is the core of the CPU, managing the multicycle instruction execution flow.
+## How the tools fit together
 
-### 3.1 Main States (Execution Phases)
+```text
+Assembly (.asm)
+     |
+     v
+assembler.py ------> program.coe ---------> Vivado Block RAM / TOP_CPU_tb
+                         |                             |
+                         v                             v
+                    simulator.py                 trace_vivado.csv
+                         |                             |
+                         v                             v
+                  trace_python.csv         convert_vivado_trace.py
+                         |                             |
+                         +------> compare_traces.py <--+
+                                      |
+                                PASS / MISMATCH
+```
 
-The FSM operates on a multicycle logic, controlled by the following states:
+See [Toolchain](docs/TOOLCHAIN.md) for each Python script and [Verification](docs/VERIFICATION.md) for trace conventions and known limitations.
 
-| VHDL State | Description | Function |
-| :---: | :--- | :--- |
-| `init` | Initialization | Resets all registers and the Program Counter (PC). |
-| `execute` | **Fetch & Decode** | Fetches the instruction in `DATA_IN`, decodes it, and sets control flags. |
-| `wait_address` | Memory Management (Phase 1) | Waits for the address to be used (`STORE` or `LOADM`). |
-| `wait_data` | ALU Management (Immediate) | Sends the immediate operand to the ALU (also handles one's complement for subtraction). |
-| `write_reg` | Write-Back | Writes the final result (ALU/Memory/Data) to the destination register. |
-| `write_mem` | Memory Write | Dedicated cycle for sending the data onto the data bus for the `STORE` operation. |
-| `compare` | Flag Update | Dedicated cycle for updating the condition flags. |
-| `wait_generic` | Synchronization | Transition state used to keep control signals active during delays. |
+## Current verification scope and next steps
 
-### 3.2 Signal Persistence (The Multicycle Secret)
+The current differential test compares the retired **instruction word**, `RX`, `RY`, `RZ`, `RA`, `RB`, `RC`, and flags `Z`, `NZ`, `N`, `P`. More useful coverage: check RAM write transactions (address/data), exercise more nested-loop and jump programs, and automate regression execution. The Python model executes **instructions**, not the clock-by-clock FSM. `0000` is used by the simulator as an end-of-test sentinel; it is **not** a documented RTL `HALT` instruction.
 
-The key to the correct execution sequence in this architecture is the **persistence of control signals** (`flag_alu`, `flag_sub`, `flag_reg`).
+## Background
 
 These flags are implemented as registers within the FSM and are **cleared only at the beginning of the `execute` state**. This mechanism ensures that the `write_reg` state (which occurs several cycles later) "remembers" whether it should write a result coming from the **ALU** (`ALU_REG`) or a value read from Memory (`DATA_IN`).
 
@@ -148,3 +152,4 @@ The main files of the project are:
 ## 👤 Author
 
 **Raffaele Petrolo**
+This project started as an attempt to understand what happens inside a processor, from the adder logic to instruction execution. The longer-term experiments include graphical output and increasingly complex software. Running a port of DOOM is an aspiration, not a current capability.
