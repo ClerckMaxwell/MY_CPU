@@ -22,6 +22,8 @@ package cpu_defs is
     constant OP_ADDR : std_logic_vector(3 downto 0) := "1010"; --000a
     constant OP_SUBR : std_logic_vector(3 downto 0) := "1011";  --000b
     constant OP_MOVE: std_logic_vector(3 downto 0) := "1100";  --000c
+    constant OP_JUMPIZ: std_logic_vector(3 downto 0) := "1101";  --000d change PC immediatly if last operation return 0
+    constant OP_JUMPINZ: std_logic_vector(3 downto 0) := "1110";  --000e change PC immediatly if last operation don't return 0
 
     ---------------------------------------------------------------------
     -- REGISTRI (bits 4 ... 7) e (8 ... 11)

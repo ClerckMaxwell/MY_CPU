@@ -1,6 +1,5 @@
 --This project was done by Raffaele Petrolo (class 2002), Electronic Engineering student at 
---University of Calabria. It tooks only a week, and i think everyone could do it,
---i mean, i just thought a machine that could possibly follow some instructioins and this 
+--University of Calabria. I just thought a machine that could possibly follow some instructioins and this 
 --is the result.
 --I remember when i was a child when Computers seems black magic to me, and now i'm able to build my own.
 --This makes me think how much time is gone, we all grow up and I didn't even notice it
@@ -10,7 +9,16 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 
 entity TOP_CPU is
-port(clock ,reset : in std_logic);
+port(clock ,reset : in std_logic;
+        RX_top, RY_top, RZ_top : out std_logic_vector(15 downto 0);
+        RA_top, RB_top, RC_top : out std_logic_vector(15 downto 0);
+        --debug
+        instruction_retired_top: out std_logic;
+        PC_debug_top: out std_logic_vector(15 downto 0);
+        INSTRUCTION_WORD_debug : out std_logic_vector(15 downto 0);
+        ADDRESS_debug_top: out std_logic_vector(15 downto 0);
+        FLAGS_debug_top   : out std_logic_vector(3 downto 0)
+        );
 end TOP_CPU;
 
 architecture Behavioral of TOP_CPU is
@@ -31,7 +39,7 @@ component FSM is
         clock, reset : in std_logic;
         DATA_IN      : in std_logic_vector (15 downto 0);
         ALU_REG      : in std_logic_vector (15 downto 0);
-        ALU_REG2      : in std_logic_vector (15 downto 0);
+        ALU_REG2     : in std_logic_vector (15 downto 0);
         CMP_RES      : in std_logic_vector (1 downto 0);
         ADDRESS      : out std_logic_vector (15 downto 0);
         DATA_OUT     : out std_logic_vector (15 downto 0);
@@ -40,8 +48,15 @@ component FSM is
         read         : out std_logic;
         write        : out std_logic_vector(0 downto 0);
         cin_alu      : out std_logic;
-        compare_alu      : out std_logic
-    ); 
+        compare_alu  : out std_logic;
+        RX_out, RY_out, RZ_out : out std_logic_vector(15 downto 0);
+        RA_out, RB_out, RC_out : out std_logic_vector(15 downto 0);
+        -- Debug
+        instruction_retired: out std_logic;
+        PC_debug      : out std_logic_vector(15 downto 0);
+        instruction_word_reg : out std_logic_vector(15 downto 0);
+        FLAGS_debug   : out std_logic_vector(3 downto 0)
+    );  
 end component;
 
 component blk_mem_gen_0 IS
@@ -69,6 +84,8 @@ end component;
 
 begin
 
+ADDRESS_debug_top <= ADDRESS_TOP;
+
 process(clock)
 begin
 if(rising_edge(clock)) then 
@@ -77,9 +94,8 @@ DATA_B <= DATA_A;
 end if;
 end process;
 
-
-
-FSM_port: FSM port map(clock, reset, DATA_FROM_RAM, DATA_ALU(15 downto 0),FAST_RES,CMP, ADDRESS_TOP, DATA_FROM_FSM, C, D, read_top, write_top,cin, compare_alu);
+FSM_port: FSM port map(clock, reset, DATA_FROM_RAM, DATA_ALU(15 downto 0),FAST_RES,CMP, ADDRESS_TOP, DATA_FROM_FSM, C, D, read_top, write_top,cin, 
+compare_alu, RX_top, RY_top, RZ_top, RA_top, RB_top, RC_top, instruction_retired_top, PC_debug_top, INSTRUCTION_WORD_debug ,FLAGS_debug_top);
 MEMORY_PORT: blk_mem_gen_0 port map(clock, read_top, write_top, ADDRESS_TOP, DATA_FROM_FSM, DATA_FROM_RAM);
 ALU_PORT: ALU port map(DATA_A, DATA_B, C, D, cin, compare_alu,DATA_ALU, FAST_RES,CMP);
 end Behavioral;

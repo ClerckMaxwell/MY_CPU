@@ -1,0 +1,28 @@
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.mif', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.veo', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.vho', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0_sim_netlist.v', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0_sim_netlist.vhdl', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/sim/blk_mem_gen_0.v', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/ip/blk_mem_gen_0/synth/blk_mem_gen_0.vhd', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'MY_CPU.srcs/sources_1/new/FSM.vhd', LF will be replaced by CRLF the next time Git touches it
+ MY_CPU.srcs/sim_1/imports/new/TB_CPU.vhd           | 87 [32m+++++++++++[m[31m---------[m
+ .../sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.mif   | 81 [32m+++++++++++++[m[31m------[m
+ .../sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.veo   |  2 [32m+[m[31m-[m
+ .../sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.vho   |  2 [32m+[m[31m-[m
+ .../sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci   | 16 [32m++[m[31m--[m
+ .../sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xml   | 38 [32m++++[m[31m-----[m
+ .../ip/blk_mem_gen_0/blk_mem_gen_0_sim_netlist.v   | 32 [32m++++[m[31m----[m
+ .../blk_mem_gen_0/blk_mem_gen_0_sim_netlist.vhdl   | 32 [32m++++[m[31m----[m
+ .../ip/blk_mem_gen_0/blk_mem_gen_0_stub.v          |  4 [32m+[m[31m-[m
+ .../ip/blk_mem_gen_0/blk_mem_gen_0_stub.vhdl       |  4 [32m+[m[31m-[m
+ .../sources_1/ip/blk_mem_gen_0/sim/blk_mem_gen_0.v |  6 [32m+[m[31m-[m
+ .../ip/blk_mem_gen_0/synth/blk_mem_gen_0.vhd       | 14 [32m++[m[31m--[m
+ MY_CPU.srcs/sources_1/new/FSM.vhd                  | 93 [32m+++++++++++++++++[m[31m-----[m
+ MY_CPU.srcs/sources_1/new/TOP_CPU.vhd              | 34 [32m+++++[m[31m---[m
+ MY_CPU.srcs/sources_1/new/cpu_defs.vhd             |  2 [32m+[m
+ MY_CPU.xpr                                         | 60 [32m++++++++++[m[31m----[m
+ TOP_CPU_tb_behav.wcfg                              | 18 [32m+++[m[31m--[m
+ 17 files changed, 337 insertions(+), 188 deletions(-)

@@ -18,7 +18,14 @@ entity FSM is
         read         : out std_logic;
         write        : out std_logic_vector(0 downto 0);
         cin_alu      : out std_logic;
-        compare_alu  : out std_logic
+        compare_alu  : out std_logic;
+        RX_out, RY_out, RZ_out : out std_logic_vector(15 downto 0);
+        RA_out, RB_out, RC_out : out std_logic_vector(15 downto 0);
+        -- Debug
+        instruction_retired: out std_logic;
+        PC_debug      : out std_logic_vector(15 downto 0);
+        instruction_word_reg : out std_logic_vector(15 downto 0);
+        FLAGS_debug   : out std_logic_vector(3 downto 0)
     ); 
 end FSM;
 
@@ -30,6 +37,7 @@ architecture Behavioral of FSM is
 
     signal DATA_OP, DATA_REG, DATA_REG2 : std_logic_vector(3 downto 0);
     signal PC, PC_REG, PC_REG2, PC_REG3 : std_logic_vector(15 downto 0);
+    signal FOR_JUMP : std_logic_vector(15 downto 0);
 
     -- flags e segnali interni
     signal flags : std_logic_vector(7 downto 0);
@@ -40,13 +48,22 @@ architecture Behavioral of FSM is
     -- REGISTER CACHE
     signal DATA_RX, DATA_RY, DATA_RZ : std_logic_vector(15 downto 0);
     signal DATA_RA, DATA_RB, DATA_RC : std_logic_vector(15 downto 0);
+   
 
 begin
-
+    
+    RX_out<=DATA_RX;
+    RY_out<=DATA_RY;
+    RZ_out<=DATA_RZ;
+    RA_out<=DATA_RA;
+    RB_out<=DATA_RB;
+    RC_out<=DATA_RC;
     DATA_OP   <= DATA_IN(3 downto 0);
     DATA_REG  <= DATA_IN(7 downto 4);
     DATA_REG2 <= DATA_IN(11 downto 8);
-
+    FOR_JUMP  <= "0000"&DATA_IN(15 downto 4);
+    FLAGS_debug <= FLAGZ & FLAGNZ & FLAGN & FLAGP;
+    instruction_word_reg <= DATA_IN; 
     process (clock, reset)
     begin
         if (reset = '1') then
@@ -77,7 +94,8 @@ begin
             write       <= "0";
             flag_pickup <= '0';  
             flag_alu    <= '0';
-            cin_alu     <= '0';           
+            cin_alu     <= '0';
+            instruction_retired <= '0';           
         elsif rising_edge(clock) then
 
             case state is
@@ -91,6 +109,7 @@ begin
                         ADDRESS <= "0000000000000001";
                         PC      <= "0000000000000010";
                         state   <= execute;
+                        instruction_retired <= '1'; 
                     else
                         state <= init;
                     end if;
@@ -113,12 +132,13 @@ begin
                     FLAGNZ <= '0'; 
                     FLAGN <= '0'; 
                     FLAGP <= '0';
-
+                    instruction_retired <= '0';
                     case DATA_OP is
 
                         -- STORE
                         when OP_STORE =>
                             ADDRESS <= PC;
+                            --PC <= PC +1;    
                             state   <= wait_address;
                             case DATA_REG is
                                 when RX => flags <= FLAG_RX;
@@ -127,13 +147,13 @@ begin
                                 when RA => flags <= FLAG_RA;
                                 when RB => flags <= FLAG_RB;
                                 when RC => flags <= FLAG_RC;
-                                when others => state <= execute;
+                                when others => state <= execute; --va messo
                             end case;
 
                         -- LOAD DIRECTLY
                         when OP_LOAD =>
                             ADDRESS <= PC;
-                            PC      <= PC + 1;
+                           PC      <= PC + 1;
                             state   <= write_reg;
                             case DATA_REG is
                                 when RX => flags <= FLAG_RX;
@@ -149,7 +169,7 @@ begin
                         when OP_LOADM =>
                             ADDRESS     <= PC;
                             flag_pickup <= '1';
-                            PC          <= PC + 1;
+                           --PC          <= PC + 1;
                             state       <= wait_address;
                             case DATA_REG is
                                 when RX => flags <= FLAG_RX;
@@ -186,7 +206,6 @@ begin
                             flag_alu <= '1';
                             flag_reg <= '1';
                             state    <= write_reg;
-                            
                             if DATA_OP = OP_SUBR then
                                 flag_sub    <= '1';
                                 compare_alu <= '1'; 
@@ -218,7 +237,6 @@ begin
                         when OP_COMPARE =>
                             compare_alu <= '1';
                             state       <= compare;
-                            
                             case DATA_REG2 is
                                 when RX => FAST_COMP_C <= DATA_RX;
                                 when RY => FAST_COMP_C <= DATA_RY;
@@ -246,7 +264,8 @@ begin
                             PC_REG3 <= PC_REG2;
                             PC      <= PC + 1;
                             ADDRESS <= PC; 
-                            state   <= execute;    
+                            state   <= execute;
+                            instruction_retired <= '1';
                         
                         -- JUMPZ
                         when OP_JUMPZ =>
@@ -262,6 +281,7 @@ begin
                                 PC_REG3 <= (others => '0');                        
                                 PC      <= PC + 1;
                                 state <= execute;
+                                instruction_retired <= '1';
                             end if;
                             
 
@@ -279,18 +299,45 @@ begin
                                 PC_REG3 <= (others => '0');                        
                                 PC      <= PC + 1;
                                 state <= execute;
+                                instruction_retired <= '1';
                             end if;
+                            
+                        when OP_JUMPIZ =>
+                            ADDRESS <= PC;
+                            if (FLAGZ = '1') then
+                                ADDRESS <= FOR_JUMP; 
+                                PC      <= FOR_JUMP + 1;
+                                JUMPATO <= '1';
+                                state <= wait_generic;                          
+                            else                      
+                                PC      <= PC + 1;
+                                state <= execute;
+                                instruction_retired <= '1';
+                            end if;
+                            
+                        when OP_JUMPINZ =>
+                            ADDRESS <= PC;
+                            if (FLAGNZ = '1') then
+                                ADDRESS <= FOR_JUMP; 
+                                PC      <= FOR_JUMP + 1;
+                                JUMPATO <= '1';
+                                state <= wait_generic;                          
+                            else                      
+                                PC      <= PC + 1;
+                                state <= execute;
+                                instruction_retired <= '1';
+                            end if;                                                            
                                                    
 
 when OP_MOVE =>
     ADDRESS <= PC;
     PC      <= PC + 1;
-    state   <= execute; 
-
+    state   <= execute;
+    instruction_retired <= '1';   
     -- Primo livello: Seleziona CHI riceve il dato (Destinazione = DATA_REG2)
     case DATA_REG2 is
     
-        -- Destinazione: O
+        -- Destinazione: X
         when RX =>
             case DATA_REG is -- Seleziona la Sorgente
                 when RX => DATA_RX <= DATA_RX; -- (nop)
@@ -302,7 +349,7 @@ when OP_MOVE =>
                 when others => null;
             end case;
 
-        -- Destinazione: M
+        -- Destinazione: Y
         when RY =>
             case DATA_REG is
                 when RX => DATA_RY <= DATA_RX;
@@ -314,7 +361,7 @@ when OP_MOVE =>
                 when others => null;
             end case;
 
-        -- Destinazione: E
+        -- Destinazione: Z
         when RZ =>
             case DATA_REG is
                 when RX => DATA_RZ <= DATA_RX;
@@ -326,7 +373,7 @@ when OP_MOVE =>
                 when others => null;
             end case;
 
-        -- Destinazione: R
+        -- Destinazione: A
         when RA =>
             case DATA_REG is
                 when RX => DATA_RA <= DATA_RX;
@@ -338,7 +385,7 @@ when OP_MOVE =>
                 when others => null;
             end case;
 
-        -- Destinazione: D
+        -- Destinazione: B
         when RB =>
             case DATA_REG is
                 when RX => DATA_RB <= DATA_RX;
@@ -350,7 +397,7 @@ when OP_MOVE =>
                 when others => null;
             end case;
 
-        -- Destinazione: A
+        -- Destinazione: C
         when RC =>
             case DATA_REG is
                 when RX => DATA_RC <= DATA_RX;
@@ -384,7 +431,8 @@ when OP_MOVE =>
                     if (flag_pickup = '1') then
                         state <= wait_mem;
                     else 
-                        state <= write_mem; 
+                        state <= write_mem;
+                       -- PC <= PC +1; 
                         write <= "1";
                         case flags is
                             when FLAG_RX => DATA_OUT <= DATA_RX;
@@ -431,6 +479,7 @@ when OP_MOVE =>
                     ADDRESS <= PC; 
                     PC      <= PC + 1;
                     state <= execute;
+                    instruction_retired <= '1';
                     -- Gestione scrittura registri (logica unificata)
                     case flags is
                         when FLAG_RX => 
@@ -475,6 +524,7 @@ when OP_MOVE =>
                     PC      <= PC + 1;
                     ADDRESS <= PC;
                     state   <= execute;
+                    instruction_retired <= '1';
                     case CMP_RES is
                         when "11" => 
                             FLAGN  <= '1';
@@ -497,8 +547,11 @@ when OP_MOVE =>
                     elsif (JUMPATO = '1') then
                         PC    <= PC + 1;
                         state <= execute;
+                        instruction_retired <= '1';
                     else 
+                        PC<=PC+1;
                         state <= execute;
+                        instruction_retired <= '1';
                     end if;
 
                 when others =>
